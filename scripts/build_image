@@ -1,0 +1,1 @@
+docker build . -t saulopro/devcontainer:latest

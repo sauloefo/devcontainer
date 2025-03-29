@@ -1,0 +1,61 @@
+# capture the project folder
+if [[ $PWD =~ ^/workspaces/\.* && ! -d "/etc/devcontainer/variables" ]]; then
+  mkdir -p /etc/devcontainer/variables
+  echo "$(pwd)" > /etc/devcontainer/variables/project_folder
+fi
+
+# export project folder
+
+export dc_project_folder="$(cat /etc/devcontainer/variables/project_folder)"
+
+if [ ! -z "$dc_project_folder" ]; then
+
+  # export tmp_folder
+  export dc_tmp_folder="${dc_project_folder}/tmp/devcontainer"
+
+  [ -d "${dc_tmp_folder}" ] || mkdir -p "${dc_tmp_folder}"
+
+  # change bash history location
+
+  export HISTFILE=${dc_tmp_folder}/bash_history
+
+  # include parent gitconfig
+  parent_gitconfig_mark="# include parent gitconfig"
+  if [ -f ~/.gitconfig ] && ! grep -q "$parent_gitconfig_mark" ~/.gitconfig; then
+    echo "$parent_gitconfig_mark" >> ~/.gitconfig
+    echo "[include]" >> ~/.gitconfig
+    echo "        path = $dc_tmp_folder/gitconfig" >> ~/.gitconfig
+  fi
+
+  # setup oh-my-posh
+
+  PATH="$HOME/.local/bin:$PATH"
+
+  # change the variable below to the theme you want to use
+  # you can find the list of available themes in ~/.cache/oh-my-posh/themes (preview: https://ohmyposh.dev/docs/themes)
+  omp_theme=`[ -f "$dc_tmp_folder/oh_my_posh_theme" ] && cat "$dc_tmp_folder/oh_my_posh_theme" || echo ''`
+  omp_theme="${omp_theme:-onehalf.minimal}"
+  eval "$(oh-my-posh init bash --config /root/.cache/oh-my-posh/themes/${omp_theme}.omp.json)"
+fi
+
+# change default edit to nvim
+
+export EDITOR=nvim
+
+# aliases
+
+alias g="git"
+alias gs="git status"
+alias gc="git add . && git commit -m"
+alias ga="git add . && git commit --amend --no-edit"
+alias gl="git log --oneline"
+alias gpush="git push"
+alias gpull="git pull"
+alias gr="git reset"
+
+alias reload="exec "$SHELL""
+alias ll="ls -alF"
+alias la="ls -A"
+alias l="ls -CF"
+
+alias vi="nvim"
