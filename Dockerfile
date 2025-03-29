@@ -3,6 +3,26 @@ ENV DOCKER_BUILDKIT=1
 
 SHELL ["/bin/bash", "-l", "-euxo", "pipefail", "-c"]
 
+RUN <<EOF
+  apt update
+  apt full-upgrade -y
+EOF
+
+ENV HOME="/root"
+
+ENV my_bashrc="/etc/devcontainer/bashrc"
+
+RUN echo ". $my_bashrc" >> ~/.bashrc
+
+COPY ./devcontainer /etc/devcontainer
+
+# install hstr
+
+RUN <<EOF
+  apt install -y --no-install-recommends hstr
+  hstr --show-configuration >> $my_bashrc
+EOF
+
 # install gh apt repository
 
 RUN <<EOF
@@ -23,14 +43,6 @@ RUN <<EOF
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 EOF
-
-ENV HOME="/root"
-
-ENV bashrc="$HOME/.bashrc"
-
-RUN echo ". /etc/devcontainer/bashrc" >> "$bashrc"
-
-COPY ./devcontainer /etc/devcontainer
 
 # setup ssh forwarding
 
