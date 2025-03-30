@@ -7,6 +7,8 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    env:
+      docker_image_name: ${{ vars.DOCKER_USERNAME }}/devcontainer
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,21 +21,23 @@ jobs:
           git diff --exit-code HEAD~1 -- version || echo "result=true" >> $GITHUB_OUTPUT
 
       - name: Set new tag
+        id: set_new_tag
         if: ${{ steps.check_if_version_changed.outputs.result == 'true' }}
         run: |
           new_version=$(cat version)
           git tag $new_version
           git push origin $new_version
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         if: ${{ steps.check_if_version_changed.outputs.result == 'true' }}
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6.15.0
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/devcontainer:latest ${{ secrets.DOCKER_USERNAME }}/devcontainer:$(cat version))
+          tags: "${{ env.docker_image_name }}:latest,${{ env.docker_image_name }}:${{ steps.set_new_tag.outputs.new_version }}"
           build-args: |
             VERSION=$(cat version)
         env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
