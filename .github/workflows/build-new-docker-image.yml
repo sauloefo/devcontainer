@@ -18,7 +18,7 @@ jobs:
       - name: Check if version has changed
         id: check_version
         run: |
-          git fetch origin main
+          # git fetch origin main
           git diff --exit-code origin/main -- version || echo "version_changed='true'" >> $GITHUB_ENV
 
       - name: Set new tag
