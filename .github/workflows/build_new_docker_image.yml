@@ -7,30 +7,28 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    env:
-      version_changed: 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
            fetch-depth: 2
 
-      - name: Check if version has changed
-        id: check_version
+      - name: Check if version changed
+        id: check_if_version_changed
         run: |
           # git fetch origin main
           # git diff --exit-code origin/main -- version || echo "version_changed='true'" >> $GITHUB_ENV
-          git diff --exit-code HEAD~1 -- version || echo "version_changed='true'" >> $GITHUB_ENV
+          git diff --exit-code HEAD~1 -- version || echo "result=true" >> $GITHUB_OUTPUT
 
       - name: Set new tag
-        if: env.version_changed == 'true'
+        if: ${{ steps.check_if_version_changed.outputs.result == 'true' }}
         run: |
           new_version=$(cat version)
           git tag -v $new_version -m "Version $new_version"
           git push origin $new_version
 
       - name: Build and push Docker image
-        if: env.version_changed == 'true'
+        if: ${{ steps.check_if_version_changed.outputs.result == 'true' }}
         uses: docker/build-push-action@v4
         with:
           context: .
