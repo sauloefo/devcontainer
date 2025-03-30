@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -euo pipefail
+
+[ -z  "$1" ] && { echo "Usage: $0 <project-name>"; exit 1; }
+
+docker_image="sauloefo/devcontainer:latest"
+
+project_folder=`readlink -f "$(pwd)/$1"`
+project_name=`basename $project_folder`
+
+[ -d "$project_folder" ] && new_folder="false" || new_folder="true"
+
+mkdir -p "$project_folder/.devcontainer"
+
+touch "$project_folder/.devcontainer/devcontainer.json"
+
+cat <<EOF > "$project_folder/.devcontainer/devcontainer.json"
+{
+  "name": "$project_name",
+  "dockerFile": "Dockerfile",
+  "initializeCommand": "docker pull $docker_image",
+}
+EOF
+
+touch "$project_folder/.devcontainer/Dockerfile"
+cat <<EOF > "$project_folder/.devcontainer/Dockerfile"
+FROM $docker_image
+EOF
+
+if [ "$new_folder" = "true" ]; then
+  cd "$project_folder"
+
+  git init
+
+  git add .
+  git commit -m "Initial commit"
+fi
+
+if [ -f "$project_folder/.git/info/exclude" ]; then
+  echo "tmp/devcontainer" >> .git/info/exclude
+fi
+
+echo "devcontainer in $project_name created successfully."
