@@ -19,7 +19,7 @@ jobs:
         id: check_version
         run: |
           git fetch origin main
-          git diff --exit-code origin/main -- version || version_changed=true
+          git diff --exit-code origin/main -- version || echo "version_changed='true'" >> $GITHUB_ENV
 
       - name: Set new tag
         if: env.version_changed == 'true'
