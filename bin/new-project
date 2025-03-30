@@ -27,15 +27,11 @@ cat <<EOF > "$project_name/.devcontainer/Dockerfile"
 FROM $docker_image
 EOF
 
-echo "going into $project_name ..."
-
 cd "$project_name"
-
-echo "Creating git repository ..."
 
 git init
 
-echo "Creating initial commit ..."
+echo "tmp/devcontainer" >> .git/info/exclude
 
 git add .
 git commit -m "Initial commit"
