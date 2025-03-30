@@ -8,7 +8,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     env:
-      docker_image_name: ${{ vars.DOCKER_USERNAME }}/devcontainer
+      docker_image_name: ghcr.io/${{ vars.DOCKER_USERNAME }}/devcontainer
     steps:
       - name: Checkout
         uses: actions/checkout@v4
