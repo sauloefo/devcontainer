@@ -36,6 +36,7 @@ jobs:
           context: .
           push: true
           tags: "${{ env.docker_image_name }}:latest,${{ env.docker_image_name }}:${{ steps.set_new_tag.outputs.new_version }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           build-args: |
             VERSION=$(cat version)
         env:
