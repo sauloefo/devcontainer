@@ -8,7 +8,7 @@ set -u
 
 docker_image="sauloefo/devcontainer:latest"
 
-[ -d "$$1" ] && new_folder="false" || new_folder="true"
+[ -d "$1" ] && new_folder="false" || new_folder="true"
 
 [ "$new_folder" = "true" ] && mkdir -p "$1"
 
@@ -41,15 +41,14 @@ EOF
 
 if [ "$new_folder" = "true" ]; then
   cd "$project_folder"
-
   git init
-
   git add .
   git commit -m "Initial commit"
+  cd -
 fi
 
 if [ -f "$project_folder/.git/info/exclude" ]; then
-  echo "tmp/devcontainer" >> .git/info/exclude
+  echo "tmp/devcontainer" >> "$project_folder/.git/info/exclude"
 fi
 
 echo "devcontainer in $project_name created successfully."
