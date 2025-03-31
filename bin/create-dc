@@ -1,17 +1,28 @@
 #!/bin/bash
 
-set -euo pipefail
+set -eo pipefail
 
-[ -z  "$1" ] && { echo "Usage: $0 <project-name>"; exit 1; }
+[ -z  "$1" ] && { echo "Usage: `basename $0` <project-name>"; exit 1; }
+
+set -u
 
 docker_image="sauloefo/devcontainer:latest"
 
-project_folder=`readlink -f "$(pwd)/$1"`
+[ -d "$$1" ] && new_folder="false" || new_folder="true"
+
+[ "$new_folder" = "true" ] && mkdir -p "$1"
+
+project_folder=`realpath "$1"`
 project_name=`basename $project_folder`
 
-[ -d "$project_folder" ] && new_folder="false" || new_folder="true"
+devcontainer_folder="$project_folder/.devcontainer"
 
-mkdir -p "$project_folder/.devcontainer"
+[ -d "$devcontainer_folder" ] || mkdir "$devcontainer_folder"
+
+if [ -f "$devcontainer_folder/devcontainer.json" ]; then
+  echo "devcontainer.json already exists";
+  exit 1
+fi
 
 touch "$project_folder/.devcontainer/devcontainer.json"
 
