@@ -49,8 +49,8 @@ fi
 
 git_exclude_file="$project_folder/.git/info/exclude"
 
-if [ -f "$git_exclude_file" ] && [ ! `grep -e "tmp/devcontainer" "$git_exclude_file"` ]; then
-  echo "tmp/devcontainer" >> "$git_exclude_file"
+if [ -f "$git_exclude_file" ] && [ ! `grep -e ".devcontainer/tmp" "$git_exclude_file"` ]; then
+  echo ".devcontainer/tmp" >> "$git_exclude_file"
 fi
 
 echo "devcontainer in $project_name created successfully."
