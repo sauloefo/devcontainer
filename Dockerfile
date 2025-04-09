@@ -3,6 +3,11 @@ ENV DOCKER_BUILDKIT=1
 
 SHELL ["/bin/bash", "-l", "-euxo", "pipefail", "-c"]
 
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Lisbon
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+
 RUN <<EOF
   apt update
   apt full-upgrade -y
@@ -39,7 +44,7 @@ RUN <<EOF
   apt full-upgrade -y
   apt install -y --no-install-recommends \
     curl git gh neovim nano jq tar unzip \
-    gnupg openssh-client libssl-dev ca-certificates bash-completion xz-utils locales
+    gnupg2 openssh-client libssl-dev ca-certificates bash-completion xz-utils locales
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 EOF
